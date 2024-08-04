@@ -1,0 +1,44 @@
+{
+    "courses":[
+        {
+            "id":1,
+            "title":"Guitar Fundamentals",
+            "slug":"guitar-fundamentals",
+            "description":"Learn the basics of playing guitar with our comprehensive beginner's course.",
+            "price": 99.99,
+            "instructor":"John Doe",
+            "isFeatured":true,
+            "image":"https://img.freepik.com/free-photo/texture-treble-clef-dark-background-isolated-generative-ai_169016-29581.jpg?size=626&ext=jpg&ga=GA1.1.2008272138.1722643200&semt=sph"
+        },
+        {
+            "id":2,
+            "title": "Piano for Beginners",
+            "slug": "piano-for-beginners",
+            "description": "Start your musical journey with foundational piano skills taught by expert instructors.",
+            "price": 109.99,
+            "instructor":"John Doeee",
+            "isFeatured":true,
+            "image":"https://img.freepik.com/free-photo/texture-treble-clef-dark-background-isolated-generative-ai_169016-29581.jpg?size=626&ext=jpg&ga=GA1.1.2008272138.1722643200&semt=sph"
+        },
+        {
+            "id":3,
+            "title": "Advanced Vocal Techniques",
+            "slug": "advanced-vocal-techniques",
+            "description": "Enhance your singing with advanced vocal techniques for intermediate to advanced learners.",
+            "price": 119.99,
+            "instructor": "Emily Johnson",
+            "isFeatured":true,
+            "image":"https://img.freepik.com/free-photo/texture-treble-clef-dark-background-isolated-generative-ai_169016-29581.jpg?size=626&ext=jpg&ga=GA1.1.2008272138.1722643200&semt=sph"
+        },
+        {
+            "id":4,
+            "title": "Drumming Mastery",
+            "slug": "drumming-mastery",
+            "description": "Master the drums with our comprehensive course covering all skill levels.",
+            "price": 129.99,
+            "instructor": "Mike Brown",
+            "isFeatured":true,
+            "image":"https://img.freepik.com/free-photo/texture-treble-clef-dark-background-isolated-generative-ai_169016-29581.jpg?size=626&ext=jpg&ga=GA1.1.2008272138.1722643200&semt=sph"
+        }
+    ]
+}

@@ -69,7 +69,7 @@ const UpcomingWebinars = () => {
              <p className='mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl'>Enhance Your Musical Journey</p>
           </div>
          </div>
-         <div className='mt-10'>
+         <div className='mt-10 ml-6 mr-6'>
             
                   <HoverEffect items={projects.map(webinar=>(
                     {

@@ -25,13 +25,13 @@ export default function SignupFormDemo() {
       <form className="my-4" onSubmit={handleSubmit}>
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-2">
           <LabelInputContainer>
-            <Label htmlFor="firstname">First name</Label>
-            <Input id="firstname" placeholder="Tyler" type="text" />
+            <Label htmlFor="username">Username</Label>
+            <Input id="username" placeholder="Tyler" type="text" />
           </LabelInputContainer>
-          <LabelInputContainer>
+          {/* <LabelInputContainer>
             <Label htmlFor="lastname">Last name</Label>
             <Input id="lastname" placeholder="Durden" type="text" />
-          </LabelInputContainer>
+          </LabelInputContainer> */}
         </div>
         <LabelInputContainer className="mb-2">
           <Label htmlFor="email">Email Address</Label>

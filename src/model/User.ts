@@ -1,11 +1,13 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-export interface Message extends Document {
+// Define the Message interface
+export interface IMessage extends Document {
   content: string;
   createdAt: Date;
 }
 
-const MessageSchema: Schema<Message> = new Schema({
+// Define the Message schema
+const MessageSchema: Schema<IMessage> = new Schema({
   content: {
     type: String,
     required: true,
@@ -17,18 +19,20 @@ const MessageSchema: Schema<Message> = new Schema({
   },
 });
 
-export interface User extends Document {
+// Define the User interface
+export interface IUser extends Document {
   username: string;
   email: string;
   password: string;
   verifyCode: string;
   verifyCodeExpiry: Date;
-  isVerified: true;
+  isVerified: boolean;
   isAcceptingMessage: boolean;
-  messages: Message[];
+  messages: IMessage[];
 }
 
-const UserSchema: Schema<User> = new Schema({
+// Define the User schema
+const UserSchema: Schema<IUser> = new Schema({
   username: {
     type: String,
     required: [true, "Username is required"],
@@ -39,7 +43,7 @@ const UserSchema: Schema<User> = new Schema({
     type: String,
     required: [true, "Email is required"],
     unique: true,
-    match: [/.+\@.+\..+/, "Please use a vaild email address"],
+    match: [/.+\@.+\..+/, "Please use a valid email address"],
   },
   password: {
     type: String,
@@ -55,7 +59,7 @@ const UserSchema: Schema<User> = new Schema({
   },
   isVerified: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   isAcceptingMessage: {
     type: Boolean,
@@ -64,6 +68,8 @@ const UserSchema: Schema<User> = new Schema({
   messages: [MessageSchema],
 });
 
-const UserModel = (mongoose.models.User as mongoose.Model<User>) || mongoose.model<User>("User", UserSchema)
+// Export the User model
+const UserModel: Model<IUser> =
+  mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
 
 export default UserModel;

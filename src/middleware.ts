@@ -4,7 +4,7 @@ import { getToken } from "next-auth/jwt";
 export { default } from "next-auth/middleware";
 
 export const config = {
-  matcher: ["/sign-in", "/sign-up", "/", "/verify/:path*"], // Adjust the matcher as needed
+  matcher: ["/login", "/signup", "/", "/verify/:path*"], // Adjust the matcher as needed
 };
 
 export async function middleware(request: NextRequest) {
@@ -13,14 +13,14 @@ export async function middleware(request: NextRequest) {
 
   if (
     token &&
-    (url.pathname === "/sign-in" ||
-      url.pathname === "/sign-up" )
+    (url.pathname === "/login" ||
+      url.pathname === "/signup" )
   ) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   if (!token && url.pathname === "/") {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
   return NextResponse.next();
 }

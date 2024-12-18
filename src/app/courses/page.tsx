@@ -3,9 +3,12 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 import courseData from "@/data/music_courses.json";
+import { useRouter } from "next/navigation";
 
 function Page() {
   const [selectedCourse, setSelectedCourse] = useState(null);
+
+  const router = useRouter();
 
   const handleBuyClick = (course: any) => {
     setSelectedCourse(course);
@@ -14,6 +17,10 @@ function Page() {
   const closePopup = () => {
     setSelectedCourse(null);
   };
+
+  const handleDetails = () =>{
+    router.push(`/course_details`);
+  }
 
   return (
     <div className="min-h-screen bg-black py-12 pt-36">
@@ -51,8 +58,10 @@ function Page() {
                   translateZ={20}
                   as="button"
                   className="px-4 py-2 rounded-xl text-xs font-normal dark:text-white"
+                  onClick ={handleDetails}
                 >
-                  Try now →
+                  {/* Try now → */}
+                  Get details →
                 </CardItem>
                 <CardItem
                   translateZ={20}

@@ -1,9 +1,13 @@
-'use client';
-import React from 'react';
-import { SparklesCore } from '@/components/ui/sparkles';
-import Image from 'next/image';
+"use client";
+import React from "react";
+import { SparklesCore } from "@/components/ui/sparkles";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/moving-border";
 
 const SparklesPreview = () => {
+  const pathname = usePathname();
+  const courseName = pathname.split("/").pop()?.replace(/-/g, " ");
   return (
     <div className="relative min-h-screen bg-black text-white flex items-center justify-center overflow-hidden">
       {/* Background Sparkles */}
@@ -15,7 +19,7 @@ const SparklesPreview = () => {
           maxSize={1.4}
           particleDensity={100}
           particleColor="#FFFFFF"
-          className="w-full h-full"
+          className="w-full h-full fixed"
         />
       </div>
 
@@ -28,29 +32,38 @@ const SparklesPreview = () => {
             alt="Transparent Image"
             width={500}
             height={500}
-            className="rounded-xl object-contain"
-            style={{ backgroundColor: 'transparent' }} // Ensures the image itself is transparent
+            className="rounded-xl object-contain fixed"
+            style={{ backgroundColor: "transparent" }}
           />
         </div>
 
         {/* Right Side - Details */}
         <div className="flex-1 flex flex-col space-y-6">
-          <h1 className="text-4xl md:text-6xl font-bold">
-          Piano for Beginners
+          <h1 className="text-4xl md:text-6xl font-bold ">
+            {courseName
+              ? courseName.charAt(0).toUpperCase() + courseName.slice(1)
+              : "Course Name"}
           </h1>
           <p className="text-lg text-gray-300">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
             varius enim in eros elementum tristique. Duis cursus, mi quis
-            viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.
+            viverra ornare, eros dolor interdum nulla, ut commodo diam libero
+            vitae erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            Suspendisse varius enim in eros elementum tristique. Duis cursus, mi
+            quis viverra ornare, eros dolor interdum nulla, ut commodo diam
+            libero vitae erat. Lorem ipsum dolor sit amet, consectetur
+            adipiscing Lorem ipsum dolor sit amet, consectetur adipiscing elit.
           </p>
-          <button className="px-6 py-3 bg-white text-black font-bold rounded-md hover:bg-gray-200">
+
+          <Button
+            borderRadius="1.75rem"
+            className="font-bold bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"
+          >
             Buy now →
-          </button>
-          
+          </Button>
         </div>
       </div>
     </div>
-    
   );
 };
 

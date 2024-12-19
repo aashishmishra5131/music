@@ -12,19 +12,19 @@ const instructor=[
   },
   {
     id:2,
-    name:'mack roy',
+    name:'Abhishek Mishra',
     designation:'Guitar Coach',
     image:'https://skillcurb.com/wp-content/uploads/2022/05/hero-instructor.png'
   },
   {
     id:3,
-    name:'Hary ria',
+    name:'Harsh Mishra',
     designation:'accordian Coach',
     image:'https://t3.ftcdn.net/jpg/02/94/21/42/360_F_294214205_ZmptWrtSwORSWadAIHSWqwSa319XlQiB.jpg'
   },
   {
     id:4,
-    name:'Jone doe',
+    name:'Rohan Mishra',
     designation:'Trumpet Coach',
     image:'https://t4.ftcdn.net/jpg/02/78/59/29/360_F_278592929_5Ia1ld3x1Dpwio0li2L8sP2k9wI8CCM7.jpg'
   },

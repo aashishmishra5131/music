@@ -10,166 +10,212 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/utils/cn";
 import Link from "next/link";
 import { ApiResponse } from "@/types/ApiResponse";
+import { BackgroundBeams } from "@/components/ui/background-beams";
+import { signIn } from "next-auth/react";
 import {
   IconBrandGithub,
-  IconBrandGoogle
+  IconBrandGoogle,
+  IconLoader2,
 } from "@tabler/icons-react";
-
 
 type SignupForm = z.infer<typeof signUpSchema>;
 
 export default function SignupFormDemo() {
-  const [form, setForm] = useState<SignupForm>({
-    username: "",
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState<SignupForm>({ username: "", email: "", password: "" });
   const [username, setUsername] = useState("");
   const [usernameMessage, setUsernameMessage] = useState("");
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [oauthStatus, setOauthStatus] = useState({ github: false, google: false });
+  const [oauthLoading, setOauthLoading] = useState<"github" | "google" | null>(null);
 
   const debounced = useDebounceCallback(setUsername, 700);
   const router = useRouter();
 
   useEffect(() => {
+    fetch("/api/auth/providers-status")
+      .then((r) => r.json())
+      .then(setOauthStatus)
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
     const checkUsernameUnique = async () => {
       if (username) {
-        console.log(username);
         setIsCheckingUsername(true);
-        setUsernameMessage(""); // Reset message
-
+        setUsernameMessage("");
         try {
           const response = await axios.get<ApiResponse>(
             `/api/check-username-unique?username=${username}`
           );
-          //console.log(response.data.message)
-          const message = response.data.message;
-          setUsernameMessage(message);
+          setUsernameMessage(response.data.message);
         } catch (error) {
           const axiosError = error as AxiosError<ApiResponse>;
-          setUsernameMessage(
-            axiosError.response?.data.message ?? "Error checking username"
-          );
+          setUsernameMessage(axiosError.response?.data.message ?? "Error checking username");
         } finally {
           setIsCheckingUsername(false);
         }
       }
     };
-
     checkUsernameUnique();
   }, [username]);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setForm((prevForm) => ({
-      ...prevForm,
-      [id]: value,
-    }));
-    debounced(e.target.value);
+    setForm((prev) => ({ ...prev, [id]: value }));
+    if (id === "username") debounced(value);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+    setError(null);
     try {
-      const response = await axios.post("/api/sign-up", form);
-      console.log(response.data.message);
+      await axios.post("/api/sign-up", form);
       router.replace(`/verify/${form.username}`);
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
-      console.log("Error in signup of user", axiosError.response?.data.message);
+      setError(axiosError.response?.data.message ?? "Signup failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black mt-11">
-      <h2 className="font-bold text-3xl text-neutral-800 dark:text-neutral-200 mt-14 text-center">
-        Welcome to MusicNext
-      </h2>
+  const handleOAuth = async (provider: "github" | "google") => {
+    if (!oauthStatus[provider]) {
+      setError(
+        `${provider === "github" ? "GitHub" : "Google"} login is not configured yet. Add API keys in .env`
+      );
+      return;
+    }
+    setOauthLoading(provider);
+    await signIn(provider, { callbackUrl: "/" });
+    setOauthLoading(null);
+  };
 
-      <form className="my-4" onSubmit={handleSubmit}>
-        <LabelInputContainer className="mb-2">
-          <Label htmlFor="username">Username</Label>
-          <Input
-            id="username"
-            placeholder="Tyler"
-            type="text"
-            value={form.username}
-            onChange={handleOnChange}
-          />
-          <p
-            className={`text-sm ${
-              usernameMessage === "Username is unique"
-                ? "text-green-500"
-                : "text-red-500"
+  return (
+    <div className="min-h-screen w-full bg-neutral-950 flex items-center justify-center relative antialiased">
+      <BackgroundBeams className="absolute inset-0 z-0" />
+      <div className="max-w-md w-full mx-auto rounded-2xl p-6 md:p-8 shadow-2xl bg-black/60 backdrop-blur-md border border-neutral-800 relative z-10 my-12">
+        <h2 className="font-bold text-3xl text-neutral-200 mt-4 text-center">
+          Welcome to MusicNext
+        </h2>
+
+        <form className="my-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm text-center">
+              {error}
+            </div>
+          )}
+          <LabelInputContainer className="mb-3">
+            <Label htmlFor="username" className="text-neutral-300">Username</Label>
+            <Input
+              id="username"
+              placeholder="Tyler"
+              type="text"
+              value={form.username}
+              onChange={handleOnChange}
+            />
+            <p
+              className={`text-xs mt-1 ${
+                usernameMessage === "Username is unique" ? "text-green-500" : "text-red-400"
+              }`}
+            >
+              {isCheckingUsername ? "Checking..." : usernameMessage}
+            </p>
+          </LabelInputContainer>
+          <LabelInputContainer className="mb-3">
+            <Label htmlFor="email" className="text-neutral-300">Email Address</Label>
+            <Input
+              id="email"
+              placeholder="you@example.com"
+              type="email"
+              value={form.email}
+              onChange={handleOnChange}
+            />
+          </LabelInputContainer>
+          <LabelInputContainer className="mb-3">
+            <Label htmlFor="password" className="text-neutral-300">Password</Label>
+            <Input
+              id="password"
+              placeholder="••••••••"
+              type="password"
+              value={form.password}
+              onChange={handleOnChange}
+            />
+          </LabelInputContainer>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="bg-gradient-to-br relative group/btn from-zinc-900 to-neutral-600 w-full text-white rounded-md h-10 font-medium mt-2 hover:opacity-90 transition-all disabled:opacity-50"
+          >
+            {isSubmitting ? "Creating account..." : "Sign up \u2192"}
+            <BottomGradient />
+          </button>
+          <p className="text-center mt-3 text-neutral-400 text-sm">
+            Already have an account?{" "}
+            <Link href="/login" className="text-purple-400 hover:text-purple-300 transition-colors">
+              Login
+            </Link>
+          </p>
+        </form>
+
+        <div className="bg-gradient-to-r from-transparent via-neutral-700 to-transparent my-4 h-[1px] w-full" />
+        <p className="text-center text-neutral-500 text-xs mb-4">or sign up with</p>
+
+        <div className="flex flex-col space-y-3">
+          <button
+            type="button"
+            onClick={() => handleOAuth("github")}
+            disabled={!!oauthLoading}
+            className={`relative group/btn flex items-center justify-center gap-2 px-4 w-full rounded-md h-10 font-medium transition-all ${
+              oauthStatus.github
+                ? "bg-zinc-900 border border-neutral-700 text-neutral-300 hover:border-neutral-500 hover:text-white"
+                : "bg-zinc-900/40 border border-neutral-800 text-neutral-600 cursor-not-allowed"
             }`}
           >
-            {isCheckingUsername ? "Checking..." : usernameMessage}
-          </p>
-        </LabelInputContainer>
-        <LabelInputContainer className="mb-2">
-          <Label htmlFor="email">Email Address</Label>
-          <Input
-            id="email"
-            placeholder="Email"
-            type="email"
-            value={form.email}
-            onChange={handleOnChange}
-          />
-        </LabelInputContainer>
-        <LabelInputContainer className="mb-2">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            placeholder="Password"
-            type="password"
-            value={form.password}
-            onChange={handleOnChange}
-          />
-        </LabelInputContainer>
+            {oauthLoading === "github" ? (
+              <IconLoader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <IconBrandGithub className="h-4 w-4" />
+            )}
+            <span className="text-sm">
+              {oauthStatus.github ? "Continue with GitHub" : "GitHub (not configured)"}
+            </span>
+            {oauthStatus.github && <BottomGradient />}
+          </button>
 
-        <button
-          className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-          type="submit"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Submitting..." : "Sign up →"}
-          <BottomGradient />
-        </button>
-        <div className="flex flex-col space-y-4 mt-10">
           <button
-            className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-            type="submit"
+            type="button"
+            onClick={() => handleOAuth("google")}
+            disabled={!!oauthLoading}
+            className={`relative group/btn flex items-center justify-center gap-2 px-4 w-full rounded-md h-10 font-medium transition-all ${
+              oauthStatus.google
+                ? "bg-zinc-900 border border-neutral-700 text-neutral-300 hover:border-neutral-500 hover:text-white"
+                : "bg-zinc-900/40 border border-neutral-800 text-neutral-600 cursor-not-allowed"
+            }`}
           >
-            <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-             Login with GitHub
+            {oauthLoading === "google" ? (
+              <IconLoader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <IconBrandGoogle className="h-4 w-4" />
+            )}
+            <span className="text-sm">
+              {oauthStatus.google ? "Continue with Google" : "Google (not configured)"}
             </span>
-            <BottomGradient />
+            {oauthStatus.google && <BottomGradient />}
           </button>
-          <button
-            className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-            type="submit"
-          >
-            <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-             Login with Google
-            </span>
-            <BottomGradient />
-          </button>
-          <p className="text-center mt-2">
-          Already have an account?{" "}
-          <Link href="/login" className="text-blue-700">
-            Login
-          </Link>
-        </p>
-          </div>
-      </form>
-      <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+
+          {(!oauthStatus.github || !oauthStatus.google) && (
+            <p className="text-neutral-600 text-[11px] text-center mt-1">
+              Add OAuth keys in{" "}
+              <span className="font-mono text-neutral-500">.env</span> to enable social login
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

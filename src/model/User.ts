@@ -29,6 +29,7 @@ export interface IUser extends Document {
   isVerified: boolean;
   isAcceptingMessage: boolean;
   messages: IMessage[];
+  purchasedCourses: mongoose.Types.ObjectId[];
 }
 
 // Define the User schema
@@ -47,15 +48,18 @@ const UserSchema: Schema<IUser> = new Schema({
   },
   password: {
     type: String,
-    required: [true, "Password is required"],
+    required: false,
+    default: "",
   },
   verifyCode: {
     type: String,
-    required: [true, "Verify Code is required"],
+    required: false,
+    default: "000000",
   },
   verifyCodeExpiry: {
     type: Date,
-    required: [true, "Verify Code expiry is required"],
+    required: false,
+    default: () => new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
   },
   isVerified: {
     type: Boolean,
@@ -66,7 +70,10 @@ const UserSchema: Schema<IUser> = new Schema({
     default: true,
   },
   messages: [MessageSchema],
-});
+  purchasedCourses: [
+    { type: Schema.Types.ObjectId, ref: "Course" }
+  ],
+}, { timestamps: true });
 
 // Export the User model
 const UserModel: Model<IUser> =

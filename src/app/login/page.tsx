@@ -22,6 +22,7 @@ export default function LoginFormDemo() {
   const router = useRouter();
   const [form, setForm] = useState<SigninForm>({ identifier: "", password: "" });
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [oauthStatus, setOauthStatus] = useState({ github: false, google: false });
   const [oauthLoading, setOauthLoading] = useState<"github" | "google" | null>(null);
 
@@ -39,16 +40,30 @@ export default function LoginFormDemo() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    const result = await signIn("credentials", {
-      redirect: false,
-      identifier: form.identifier,
-      password: form.password,
-    });
-    if (result?.error) {
-      setError(result.error);
-    } else if (result?.ok) {
-      localStorage.setItem("identifier", form.identifier);
-      router.push("/");
+    setIsLoading(true);
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        identifier: form.identifier,
+        password: form.password,
+      });
+      if (result?.error) {
+        const msg =
+          result.error === "CredentialsSignin"
+            ? "Invalid email/username or password"
+            : result.error;
+        setError(msg);
+      } else if (result?.ok) {
+        localStorage.setItem("identifier", form.identifier);
+        router.refresh();          // ← flush Next.js cache so session is visible
+        router.push("/");
+      } else {
+        setError("Login failed. Please try again.");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,9 +102,12 @@ export default function LoginFormDemo() {
           </LabelInputContainer>
 
           <button type="submit"
-            className="bg-gradient-to-br relative group/btn from-zinc-900 to-neutral-600 w-full text-white rounded-md h-10 font-medium mt-4 hover:opacity-90 transition-all">
-            Login &rarr;
-            <BottomGradient />
+            disabled={isLoading}
+            className="bg-gradient-to-br relative group/btn from-zinc-900 to-neutral-600 w-full text-white rounded-md h-10 font-medium mt-4 hover:opacity-90 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+            {isLoading
+              ? <><IconLoader2 className="h-4 w-4 animate-spin" /> Logging in...</>
+              : <>Login &rarr;</>}
+            {!isLoading && <BottomGradient />}
           </button>
           <p className="text-center mt-3 text-neutral-400 text-sm">
             New user?{" "}

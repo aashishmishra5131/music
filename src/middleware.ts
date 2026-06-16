@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { isAdminAuthenticatedFromRequest } from "@/lib/adminAuth";
 
-export { default } from "next-auth/middleware";
-
 export const config = {
   matcher: ["/login", "/signup", "/", "/verify/:path*", "/profile", "/my-courses", "/admin/:path*"],
 };

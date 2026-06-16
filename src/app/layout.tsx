@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import AuthProvider from './context/AuthProvider';
 import ConditionalLayout from "@/components/ConditionalLayout";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <AuthProvider>
       <body className={inter.className}>
+        <AnalyticsTracker />
         <ConditionalLayout>
           {children}
         </ConditionalLayout>

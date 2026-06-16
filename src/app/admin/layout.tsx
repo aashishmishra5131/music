@@ -16,10 +16,12 @@ import {
   IconLoader2,
   IconChevronRight,
   IconShoppingCart,
+  IconChartBar,
 } from "@tabler/icons-react";
 
 const navItems = [
   { label: "Dashboard", href: "/admin/dashboard", icon: IconLayoutDashboard },
+  { label: "Analytics", href: "/admin/analytics", icon: IconChartBar },
   { label: "Chat Support", href: "/admin/chat", icon: IconMessageCircle },
   { label: "Courses", href: "/admin/courses", icon: IconBook },
   { label: "Orders", href: "/admin/orders", icon: IconShoppingCart },

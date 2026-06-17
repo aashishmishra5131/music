@@ -2,6 +2,7 @@ import dbConnect from "@/lib/db.Connect";
 import UserModel from "@/model/User";
 import bcrypt from "bcryptjs";
 import { sendVerificationEmail } from "@/helpers/sendVerificationEmail";
+import { publishEvent } from "@/lib/sns";
 
 export async function POST(request: Request) {
   await dbConnect();
@@ -77,6 +78,9 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    // Publish USER_REGISTERED event to SNS (async, non-blocking)
+    publishEvent('USER_REGISTERED', { email, username }).catch(() => {});
 
     return Response.json(
       {

@@ -7,6 +7,7 @@ import OrderModel from "@/model/Order";
 import UserModel from "@/model/User";
 import mongoose from "mongoose";
 import { emitAdminStats } from "@/lib/sseManager";
+import { publishEvent } from "@/lib/sns";
 
 export async function POST(req: NextRequest) {
   try {
@@ -120,6 +121,18 @@ export async function POST(req: NextRequest) {
     } catch {
       // SSE emit failure must never block the payment response
     }
+
+    // Publish ORDER_PLACED event to SNS (non-blocking)
+    publishEvent('ORDER_PLACED', {
+      userId: userId?.toString(),
+      email: session.user.email || '',
+      username: (session.user as any).username || session.user.name || '',
+      courseTitle,
+      courseId: resolvedCourseId?.toString(),
+      price: Number(price),
+      orderId: (order as any)._id?.toString(),
+      razorpayOrderId: mockOrderId,
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,
